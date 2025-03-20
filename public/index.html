@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Demonstrasi Rakyat Online</title>
+		<title>Demonstrasi Online</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+			rel="stylesheet"
+		/>
 		<style>
 			body {
 				margin: 0;
@@ -13,11 +17,13 @@
 				align-items: center;
 				min-height: 100vh;
 				background: #333;
+				font-family: "Press Start 2P", cursive;
 			}
 			#game-container {
 				position: relative;
 			}
 			#chat-input {
+				display: none; /* Hide chat input initially */
 				position: absolute;
 				bottom: 20px;
 				left: 50%;
@@ -52,14 +58,32 @@
 				border-radius: 3px;
 				cursor: pointer;
 			}
+			#main-container {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 10px;
+			}
 		</style>
 	</head>
 	<body>
-		<div id="game-container"></div>
-		<input type="text" id="chat-input" placeholder="Type your message..." />
+		<div id="main-container">
+			<h2 style="text-align: center; color: white; font-family: 'Press Start 2P', cursive">
+				Demonstrasi Online
+			</h2>
+			<div id="game-container"></div>
+		</div>
+		<input
+			autofocus
+			type="text"
+			id="chat-input"
+			placeholder="Type your message..."
+			maxlength="80"
+		/>
 		<div id="username-modal">
-			<h2>Welcome to Demonstrasi Rakyat Online</h2>
-			<input type="text" id="username" placeholder="Enter your username" />
+			<h2>Welcome to</h2>
+			<h2>Demonstrasi Online</h2>
+			<input autofocus type="text" id="username" placeholder="Enter your username" maxlength="10" />
 			<button onclick="startGame()">Join Game</button>
 		</div>
 

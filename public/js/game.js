@@ -25,13 +25,31 @@ const config = {
 	},
 };
 
+document.addEventListener("DOMContentLoaded", function () {
+	const savedUsername = localStorage.getItem("username");
+	if (savedUsername) {
+		document.getElementById("username").value = savedUsername;
+	}
+});
+
+document.getElementById("username").addEventListener("keypress", function (event) {
+	if (event.key === "Enter") {
+		startGame();
+	}
+});
+
 function startGame() {
 	username = document.getElementById("username").value.trim();
 	if (!username) {
 		alert("Please enter a username");
 		return;
 	}
+
+	// Save username to localStorage
+	localStorage.setItem("username", username);
+
 	document.getElementById("username-modal").style.display = "none";
+	document.getElementById("chat-input").style.display = "block";
 	game = new Phaser.Game(config);
 }
 
@@ -39,6 +57,9 @@ function preload() {
 	// Load game assets
 	this.load.image("ground", "assets/ground.png");
 	this.load.image("player", "assets/player.png");
+	this.load.image("workingMan", "assets/working_man.png");
+	this.load.image("workingWoman", "assets/working_woman.png");
+	this.load.image("student", "assets/student.png");
 	this.load.image("building", "assets/building.png");
 }
 
@@ -56,15 +77,18 @@ function create() {
 	// Create building
 	this.add.image(400, 100, "building");
 
+	// Randomly select an avatar
+	const avatars = ["workingMan", "workingWoman", "student"];
+	const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
+
 	// Create player
-	player = this.add.sprite(400, 300, "player");
+	player = this.add.sprite(400, 300, randomAvatar);
 	player.setScale(2);
 
 	// Add username text above player
 	player.usernameText = this.add.text(player.x, player.y - 35, username, {
 		font: "14px Arial",
 		color: "#000000",
-		backgroundColor: "#ffffff",
 		padding: { x: 5, y: 2 },
 	});
 	player.usernameText.setOrigin(0.5, 1);
@@ -98,9 +122,19 @@ function create() {
 		avatar: "player",
 	});
 
-	socket.on("playerList", players => {
-		players.forEach(playerInfo => {
-			if (playerInfo.id !== socket.id) {
+	socket.on("playerList", playersList => {
+		// Remove players that are no longer in the list
+		otherPlayers.forEach((player, id) => {
+			if (!playersList.some(p => p.id === id)) {
+				player.destroy(); // Remove sprite
+				player.usernameText.destroy(); // Remove username text
+				otherPlayers.delete(id); // Remove from map
+			}
+		});
+
+		// Add new players if they are not already added
+		playersList.forEach(playerInfo => {
+			if (playerInfo.id !== socket.id && !otherPlayers.has(playerInfo.id)) {
 				addOtherPlayer(this, playerInfo);
 			}
 		});
@@ -203,34 +237,52 @@ function showChatBubble(scene, messageData) {
 		return; // Player not found
 	}
 
-	// Create new bubble
-	const bubble = scene.add.text(
-		targetX,
-		targetY - 50, // Position above player
-		`${messageData.message}`,
+	// Bubble dimensions
+	const bubbleWidth = 220;
+	const bubbleHeight = 50;
+	const cornerRadius = 12;
+	const padding = 10;
+
+	// Create a rounded rectangle for the bubble background
+	const bubbleBackground = scene.add.graphics();
+	bubbleBackground.fillStyle(0xffffff, 1); // White background
+	bubbleBackground.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, cornerRadius);
+	bubbleBackground.lineStyle(1, 0x000000, 1); // Black outline
+	bubbleBackground.strokeRoundedRect(0, 0, bubbleWidth, bubbleHeight, cornerRadius);
+
+	// Create the text inside the bubble
+	const bubbleText = scene.add.text(
+		bubbleWidth / 2, // Center horizontally within the bubble
+		bubbleHeight / 2, // Center vertically within the bubble
+		messageData.message,
 		{
-			font: "16px Arial",
+			font: "12px Arial",
 			color: "#000000",
-			backgroundColor: "#ffffff",
-			padding: { x: 10, y: 5 },
-			fixedWidth: 200,
+			wordWrap: { width: bubbleWidth - 2 * padding },
 			align: "center",
 		}
 	);
+	bubbleText.setOrigin(0.5, 0.5); // Ensure text is centered inside the bubble
 
-	// Center the bubble above player
-	bubble.setOrigin(0.5, 1);
+	// Create a container to group background and text together
+	const bubble = scene.add.container(targetX - bubbleWidth / 2, targetY - bubbleHeight - 55, [
+		bubbleBackground,
+		bubbleText,
+	]);
 	bubble.setDepth(1000);
 
 	// Store bubble reference
 	scene.chatBubbles[messageData.id] = bubble;
 
-	// Update bubble position when player moves
+	// Function to update the bubble position
 	const updateBubblePosition = playerInfo => {
 		if (playerInfo.id === messageData.id && scene.chatBubbles[messageData.id]) {
 			const bubbleX = playerInfo.id === socket.id ? player.x : otherPlayers.get(playerInfo.id).x;
 			const bubbleY = playerInfo.id === socket.id ? player.y : otherPlayers.get(playerInfo.id).y;
-			scene.chatBubbles[messageData.id].setPosition(bubbleX, bubbleY - 50);
+			scene.chatBubbles[messageData.id].setPosition(
+				bubbleX - bubbleWidth / 2,
+				bubbleY - bubbleHeight - 55
+			);
 		}
 	};
 
