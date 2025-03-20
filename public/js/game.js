@@ -133,7 +133,7 @@ function create() {
 	this.add.image(400, 100, "building");
 
 	// Randomly select an avatar
-	const avatars = ["workingMan", "workingWoman", "student"];
+	const avatars = ["workingMan", "workingWoman"];
 	const randomAvatar = avatars[Math.floor(Math.random() * avatars.length)];
 
 	// Create player
