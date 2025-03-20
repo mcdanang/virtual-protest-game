@@ -347,12 +347,12 @@ function showChatBubble(scene, messageData) {
 	// Listen for player movement
 	socket.on("playerMoved", updateBubblePosition);
 
-	// Remove bubble after 5 seconds
-	scene.time.delayedCall(5000, () => {
-		if (scene.chatBubbles[messageData.id]) {
-			scene.chatBubbles[messageData.id].destroy();
-			delete scene.chatBubbles[messageData.id];
-			socket.off("playerMoved", updateBubblePosition);
-		}
-	});
+	// // Remove bubble after 5 seconds
+	// scene.time.delayedCall(5000, () => {
+	// 	if (scene.chatBubbles[messageData.id]) {
+	// 		scene.chatBubbles[messageData.id].destroy();
+	// 		delete scene.chatBubbles[messageData.id];
+	// 		socket.off("playerMoved", updateBubblePosition);
+	// 	}
+	// });
 }
