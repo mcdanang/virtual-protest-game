@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Demonstrasi Online</title>
+		<title>Demo Online</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 		<link
@@ -64,27 +64,56 @@
 				align-items: center;
 				gap: 10px;
 			}
+
+			#controls {
+				position: absolute;
+				bottom: 60px;
+				right: 0%;
+				transform: translateX(-20%);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+			.control-button {
+				width: 30px;
+				height: 30px;
+				font-size: 16px;
+				margin: 5px;
+				background: #555;
+				color: white;
+				border: none;
+				border-radius: 5px;
+				cursor: pointer;
+			}
+			@media (min-width: 768px) {
+				#controls {
+					display: none;
+				}
+			}
 		</style>
 	</head>
 	<body>
 		<div id="main-container">
 			<h2 style="text-align: center; color: white; font-family: 'Press Start 2P', cursive">
-				Demonstrasi Online
+				Demo Online
 			</h2>
 			<div id="game-container"></div>
 		</div>
-		<input
-			autofocus
-			type="text"
-			id="chat-input"
-			placeholder="Type your message..."
-			maxlength="80"
-		/>
+		<input type="text" id="chat-input" placeholder="Type your message..." maxlength="80" />
 		<div id="username-modal">
 			<h2>Welcome to</h2>
-			<h2>Demonstrasi Online</h2>
+			<h2>Demo Online</h2>
 			<input autofocus type="text" id="username" placeholder="Enter your username" maxlength="10" />
 			<button onclick="startGame()">Join Game</button>
+		</div>
+
+		<div id="controls">
+			<button id="up" class="control-button">&#9650;</button>
+			<div>
+				<button id="left" class="control-button">&#9664;</button>
+				<button id="down" class="control-button">&#9660;</button>
+				<button id="right" class="control-button">&#9654;</button>
+			</div>
 		</div>
 
 		<script src="/socket.io/socket.io.js"></script>

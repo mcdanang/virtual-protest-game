@@ -36,6 +36,6 @@ const buildingBuffer = buildingCanvas.toBuffer("image/png");
 
 fs.writeFileSync("public/assets/ground.png", groundBuffer);
 fs.writeFileSync("public/assets/player.png", playerBuffer);
-fs.writeFileSync("public/assets/building.png", buildingBuffer);
+fs.writeFileSync("public/assets/building-default.png", buildingBuffer);
 
 console.log("Assets generated successfully!");

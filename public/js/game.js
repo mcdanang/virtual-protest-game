@@ -30,7 +30,56 @@ document.addEventListener("DOMContentLoaded", function () {
 	if (savedUsername) {
 		document.getElementById("username").value = savedUsername;
 	}
+
+	// Add touch control event listeners outside of Phaser
+	setupTouchControls();
 });
+
+function setupTouchControls() {
+	document.getElementById("up").addEventListener("touchstart", e => {
+		e.preventDefault();
+		touchControls.up = true;
+	});
+	document.getElementById("up").addEventListener("touchend", e => {
+		e.preventDefault();
+		touchControls.up = false;
+	});
+
+	document.getElementById("down").addEventListener("touchstart", e => {
+		e.preventDefault();
+		touchControls.down = true;
+	});
+	document.getElementById("down").addEventListener("touchend", e => {
+		e.preventDefault();
+		touchControls.down = false;
+	});
+
+	document.getElementById("left").addEventListener("touchstart", e => {
+		e.preventDefault();
+		touchControls.left = true;
+	});
+	document.getElementById("left").addEventListener("touchend", e => {
+		e.preventDefault();
+		touchControls.left = false;
+	});
+
+	document.getElementById("right").addEventListener("touchstart", e => {
+		e.preventDefault();
+		touchControls.right = true;
+	});
+	document.getElementById("right").addEventListener("touchend", e => {
+		e.preventDefault();
+		touchControls.right = false;
+	});
+}
+
+// Touch controls state
+const touchControls = {
+	up: false,
+	down: false,
+	left: false,
+	right: false,
+};
 
 document.getElementById("username").addEventListener("keypress", function (event) {
 	if (event.key === "Enter") {
@@ -50,13 +99,14 @@ function startGame() {
 
 	document.getElementById("username-modal").style.display = "none";
 	document.getElementById("chat-input").style.display = "block";
+
 	game = new Phaser.Game(config);
 }
 
 function preload() {
 	// Load game assets
 	this.load.image("ground", "assets/ground.png");
-	this.load.image("player", "assets/player.png");
+	this.load.image("road", "assets/road.png");
 	this.load.image("workingMan", "assets/working_man.png");
 	this.load.image("workingWoman", "assets/working_woman.png");
 	this.load.image("student", "assets/student.png");
@@ -66,11 +116,16 @@ function preload() {
 function create() {
 	// Initialize socket connection
 	socket = io();
-
+	const xRoadPosition = [352, 384, 416, 448];
+	const yRoadPosition = [0, 32, 64, 96, 128, 160];
 	// Create tiled ground
 	for (let x = 0; x < 832; x += 32) {
 		for (let y = 0; y < 632; y += 32) {
-			this.add.image(x, y, "ground");
+			if (xRoadPosition.includes(x) || yRoadPosition.includes(y)) {
+				this.add.image(x, y, "road");
+			} else {
+				this.add.image(x, y, "ground");
+			}
 		}
 	}
 
@@ -105,6 +160,7 @@ function create() {
 				message: chatInput.value.trim(),
 			});
 			chatInput.value = "";
+			chatInput.blur(); // Remove focus from input
 		}
 		if (e.key === " ") {
 			e.stopPropagation(); // Prevent space from triggering other game controls
@@ -119,7 +175,7 @@ function create() {
 		x: player.x,
 		y: player.y,
 		username: username,
-		avatar: "player",
+		avatar: "student",
 	});
 
 	socket.on("playerList", playersList => {
@@ -156,25 +212,28 @@ function create() {
 }
 
 function update() {
+	if (!player) return;
+
 	// Player movement
 	const speed = 4;
 	let moved = false;
 	let newX = player.x;
 	let newY = player.y;
 
-	if (cursors.left.isDown) {
+	// Handle keyboard controls
+	if (cursors.left.isDown || touchControls.left) {
 		newX -= speed;
 		moved = true;
 	}
-	if (cursors.right.isDown) {
+	if (cursors.right.isDown || touchControls.right) {
 		newX += speed;
 		moved = true;
 	}
-	if (cursors.up.isDown) {
+	if (cursors.up.isDown || touchControls.up) {
 		newY -= speed;
 		moved = true;
 	}
-	if (cursors.down.isDown) {
+	if (cursors.down.isDown || touchControls.down) {
 		newY += speed;
 		moved = true;
 	}
@@ -202,14 +261,13 @@ function update() {
 }
 
 function addOtherPlayer(scene, playerInfo) {
-	const otherPlayer = scene.add.sprite(playerInfo.x, playerInfo.y, "player");
+	const otherPlayer = scene.add.sprite(playerInfo.x, playerInfo.y, "student");
 	otherPlayer.setScale(2);
 
 	// Add username text above other players
 	otherPlayer.usernameText = scene.add.text(playerInfo.x, playerInfo.y - 35, playerInfo.username, {
 		font: "14px Arial",
 		color: "#000000",
-		backgroundColor: "#ffffff",
 		padding: { x: 5, y: 2 },
 	});
 	otherPlayer.usernameText.setOrigin(0.5, 1);
