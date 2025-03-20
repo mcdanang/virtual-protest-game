@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Demonstrasi Rakyat Online</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				min-height: 100vh;
+				background: #333;
+			}
+			#game-container {
+				position: relative;
+			}
+			#chat-input {
+				position: absolute;
+				bottom: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				width: 80%;
+				max-width: 500px;
+				padding: 10px;
+				border: none;
+				border-radius: 5px;
+				background: rgba(255, 255, 255, 0.9);
+			}
+			#username-modal {
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: white;
+				padding: 20px;
+				border-radius: 10px;
+				text-align: center;
+				z-index: 1000;
+			}
+			#username-modal input {
+				margin: 10px 0;
+				padding: 5px;
+			}
+			#username-modal button {
+				padding: 5px 15px;
+				background: #4caf50;
+				color: white;
+				border: none;
+				border-radius: 3px;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="game-container"></div>
+		<input type="text" id="chat-input" placeholder="Type your message..." />
+		<div id="username-modal">
+			<h2>Welcome to Demonstrasi Rakyat Online</h2>
+			<input type="text" id="username" placeholder="Enter your username" />
+			<button onclick="startGame()">Join Game</button>
+		</div>
+
+		<script src="/socket.io/socket.io.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+		<script src="js/game.js"></script>
+	</body>
+</html>
